@@ -3,19 +3,8 @@
 import { motion } from 'framer-motion'
 import { useBookmarks } from '@/contexts/BookmarkContext'
 
-const categories = [
-  { id: 'all', name: '全部' },
-  { id: 'development', name: '开发' },
-  { id: 'design', name: '设计' },
-  { id: 'productivity', name: '效率' },
-  { id: 'education', name: '教育' },
-  { id: 'entertainment', name: '娱乐' },
-  { id: 'news', name: '新闻' },
-  { id: 'social', name: '社交' },
-]
-
 export function CategoryNav() {
-  const { selectedCategory, setSelectedCategory } = useBookmarks()
+  const { selectedCategory, setSelectedCategory, categories } = useBookmarks()
 
   return (
     <div className="mb-8 overflow-x-auto">

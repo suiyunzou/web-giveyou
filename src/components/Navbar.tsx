@@ -1,12 +1,16 @@
 'use client'
 
 import { useState } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
+import { LoginDialog } from './LoginDialog'
 import { Menu, Search, Sun, Moon, User } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 export function Navbar() {
+  const { user, logout } = useAuth()
   const [isDark, setIsDark] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false)
 
   const toggleTheme = () => {
     setIsDark(!isDark)
@@ -38,19 +42,32 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden items-center space-x-4 md:flex">
+            {user ? (
+              <>
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  {user.isAdmin ? '管理员' : '用户'}: {user.username}
+                </span>
+                <button
+                  onClick={logout}
+                  className="rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                >
+                  退出
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setIsLoginDialogOpen(true)}
+                className="rounded-lg bg-primary px-4 py-2 text-sm text-white hover:bg-primary/90"
+              >
+                登录
+              </button>
+            )}
             <button
               onClick={toggleTheme}
               className="rounded-full p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
             >
               {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </button>
-            <a
-              href="/login"
-              className="flex items-center space-x-1 rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary-light"
-            >
-              <User className="h-5 w-5" />
-              <span>登录</span>
-            </a>
           </div>
 
           {/* Mobile Menu Button */}
@@ -82,6 +99,26 @@ export function Navbar() {
               />
               <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
             </div>
+            {user ? (
+              <>
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  {user.isAdmin ? '管理员' : '用户'}: {user.username}
+                </span>
+                <button
+                  onClick={logout}
+                  className="flex w-full items-center space-x-2 rounded-lg px-4 py-2 text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+                >
+                  退出
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setIsLoginDialogOpen(true)}
+                className="flex w-full items-center space-x-2 rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary/90"
+              >
+                登录
+              </button>
+            )}
             <button
               onClick={toggleTheme}
               className="flex w-full items-center space-x-2 rounded-lg px-4 py-2 text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
@@ -89,16 +126,14 @@ export function Navbar() {
               {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               <span>{isDark ? '切换到亮色模式' : '切换到暗色模式'}</span>
             </button>
-            <a
-              href="/login"
-              className="flex w-full items-center space-x-2 rounded-lg bg-primary px-4 py-2 text-white hover:bg-primary-light"
-            >
-              <User className="h-5 w-5" />
-              <span>登录</span>
-            </a>
           </div>
         </motion.div>
       )}
+
+      <LoginDialog
+        isOpen={isLoginDialogOpen}
+        onClose={() => setIsLoginDialogOpen(false)}
+      />
     </nav>
   )
 }

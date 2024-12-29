@@ -1,68 +1,83 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Bookmark, Share2, ExternalLink } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
+import { useBookmarks } from '@/contexts/BookmarkContext'
+import { Bookmark } from '@/contexts/BookmarkContext'
+import { ExternalLink } from 'lucide-react'
 
 interface BookmarkCardProps {
-  title: string
-  description: string
-  url: string
-  tags: string[]
+  bookmark: Bookmark
 }
 
-export function BookmarkCard({ title, description, url, tags }: BookmarkCardProps) {
+export function BookmarkCard({ bookmark }: BookmarkCardProps) {
+  const { user } = useAuth()
+  const { removeBookmark } = useBookmarks()
+
+  const handleDelete = () => {
+    if (window.confirm('确定要删除这个书签吗？')) {
+      removeBookmark(bookmark.id)
+    }
+  }
+
   return (
     <motion.div
+      layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -5 }}
-      className="group relative overflow-hidden rounded-xl bg-white/10 p-6 backdrop-blur-lg transition-all hover:bg-white/20 dark:bg-gray-800/50 dark:hover:bg-gray-800/80"
+      exit={{ opacity: 0, y: -20 }}
+      className="group relative rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
     >
-      <div className="absolute right-4 top-4 flex space-x-2">
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          className="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+      {user?.isAdmin && (
+        <button
+          onClick={handleDelete}
+          className="absolute right-2 top-2 hidden rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 group-hover:block dark:hover:bg-gray-700 dark:hover:text-gray-300"
         >
-          <Bookmark className="h-5 w-5" />
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          className="rounded-full p-2 text-gray-600 transition-colors hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
-        >
-          <Share2 className="h-5 w-5" />
-        </motion.button>
-      </div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      )}
 
       <div className="mb-4">
         <h3 className="mb-2 text-xl font-semibold text-gray-900 dark:text-white">
-          {title}
+          {bookmark.title}
         </h3>
         <p className="line-clamp-2 text-gray-600 dark:text-gray-400">
-          {description}
+          {bookmark.description}
         </p>
       </div>
 
       <a
-        href={url}
+        href={bookmark.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="mb-4 flex items-center text-primary-light hover:text-primary dark:text-primary-light dark:hover:text-primary"
+        className="mb-4 flex items-center text-sm text-primary hover:text-primary/90"
       >
-        <span className="line-clamp-1 mr-1">{url}</span>
+        <span className="line-clamp-1 mr-1">{bookmark.url}</span>
         <ExternalLink className="h-4 w-4" />
       </a>
 
       <div className="flex flex-wrap gap-2">
-        {tags.map((tag) => (
-          <motion.span
+        {bookmark.tags.map(tag => (
+          <span
             key={tag}
-            whileHover={{ scale: 1.05 }}
-            className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600"
+            className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-400"
           >
             {tag}
-          </motion.span>
+          </span>
         ))}
       </div>
     </motion.div>

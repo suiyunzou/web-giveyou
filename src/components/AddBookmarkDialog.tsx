@@ -1,16 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useBookmarks, categories } from '@/contexts/BookmarkContext'
+import { motion } from 'framer-motion'
+import { useBookmarks } from '@/contexts/BookmarkContext'
 
 export function AddBookmarkDialog() {
-  const { isAddDialogOpen, setIsAddDialogOpen, addBookmark } = useBookmarks()
+  const { isAddDialogOpen, setIsAddDialogOpen, addBookmark, categories } = useBookmarks()
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     url: '',
-    category: 'development',
+    category: '',
     tags: [] as string[],
     newTag: ''
   })
@@ -21,7 +21,7 @@ export function AddBookmarkDialog() {
       title: formData.title,
       description: formData.description,
       url: formData.url,
-      category: formData.category,
+      category: formData.category || 'other', // 如果没有选择分类，使用 'other'
       tags: formData.tags
     })
     setIsAddDialogOpen(false)
@@ -29,7 +29,7 @@ export function AddBookmarkDialog() {
       title: '',
       description: '',
       url: '',
-      category: 'development',
+      category: '',
       tags: [],
       newTag: ''
     })
@@ -55,12 +55,12 @@ export function AddBookmarkDialog() {
   if (!isAddDialogOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800"
+        className="relative mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800"
       >
         <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">添加新书签</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -115,6 +115,7 @@ export function AddBookmarkDialog() {
               onChange={e => setFormData(prev => ({ ...prev, category: e.target.value }))}
               className="w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-primary focus:ring-primary dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             >
+              <option value="">选择分类</option>
               {categories.filter(cat => cat.id !== 'all').map(category => (
                 <option key={category.id} value={category.id}>
                   {category.name}
